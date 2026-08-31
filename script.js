@@ -29,16 +29,18 @@ function initDashboard() {
 function renderBoardStructure() {
   board.innerHTML = '';
   
-  columns.forEach(col => {
+  columns.forEach((col, index) => {
     const colDiv = document.createElement('div');
     colDiv.classList.add('column');
     colDiv.id = `col-${col.id}`;
     colDiv.setAttribute('ondragover', 'allowDrop(event)');
-    colDiv.setAttribute('ondragdrop', 'removeDropStyle(event)');
     colDiv.setAttribute('ondrop', `dropTask(event, '${col.id}')`);
 
     colDiv.innerHTML = `
-      <h3 style="color: ${col.color};" title="Clique para alterar o nome" onclick="quickEditColumnName('${col.id}')">${escapeHTML(col.name)}</h3>
+      <h3 style="color: ${col.color};">
+        <span class="column-title-text" title="Clique para alterar o nome" onclick="quickEditColumnName('${col.id}')">${escapeHTML(col.name)}</span>
+        <button class="btn-delete-column" title="Excluir coluna" onclick="deleteColumn(${index})">×</button>
+      </h3>
       <div class="cards-container" id="container-${col.id}"></div>
     `;
     board.appendChild(colDiv);
@@ -73,6 +75,24 @@ window.quickEditColumnName = function(colId) {
   if (newName !== null && newName.trim() !== '') {
     col.name = newName.trim();
     localStorage.setItem('dashboard_columns', JSON.stringify(columns));
+    initDashboard();
+  }
+};
+
+window.deleteColumn = function(index) {
+  if (columns.length <= 1) {
+    alert('Você precisa manter pelo menos uma coluna.');
+    return;
+  }
+
+  const colToRemove = columns[index];
+  const confirmed = confirm(`Deseja realmente excluir a coluna "${colToRemove.name}"? As tarefas dela também serão removidas.`);
+  
+  if (confirmed) {
+    tasks = tasks.filter(task => task.status !== colToRemove.id);
+    columns.splice(index, 1);
+    localStorage.setItem('dashboard_columns', JSON.stringify(columns));
+    saveAndRender();
     initDashboard();
   }
 };
