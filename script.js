@@ -10,12 +10,12 @@ const openSettingsBtn = document.getElementById('open-settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const saveSettingsBtn = document.getElementById('save-settings-btn');
-const addColumnBtn = document.getElementById('add-column-btn');
-const columnsConfigList = document.getElementById('columns-config-list');
+const addLabelBtn = document.getElementById('add-label-btn');
+const labelsConfigList = document.getElementById('labels-config-list');
 
 let tasks = JSON.parse(localStorage.getItem('attendance_tasks')) || [];
 
-// Estrutura padrão das colunas (permite adicionar, alterar nomes, emojis e cores)
+// Lista de colunas/etiquetas
 let columns = JSON.parse(localStorage.getItem('dashboard_columns')) || [
   { id: 'pendencia', name: '📌 Pendências', color: '#dc2626' },
   { id: 'espera', name: '⏳ Em Espera', color: '#d97706' },
@@ -31,6 +31,8 @@ function initDashboard() {
 
 function renderBoardStructure() {
   board.innerHTML = '';
+  
+  // Renderiza as colunas normais
   columns.forEach(col => {
     const colDiv = document.createElement('div');
     colDiv.classList.add('column');
@@ -40,12 +42,53 @@ function renderBoardStructure() {
     colDiv.setAttribute('ondrop', `dropTask(event, '${col.id}')`);
 
     colDiv.innerHTML = `
-      <h3 style="color: ${col.color}; border-color: ${col.color}33;">${escapeHTML(col.name)}</h3>
+      <h3 style="color: ${col.color}; border-color: ${col.color}33;" title="Clique para editar o nome" onclick="quickEditColumnName('${col.id}')">${escapeHTML(col.name)}</h3>
       <div class="cards-container" id="container-${col.id}"></div>
     `;
     board.appendChild(colDiv);
   });
+
+  // Renderiza a coluna em branco com o botão "+" para adicionar nova coluna/etiqueta
+  const addColDiv = document.createElement('div');
+  addColDiv.classList.add('column-add');
+  addColDiv.innerHTML = `
+    <button class="add-column-card-btn" onclick="promptAddColumn()" title="Adicionar nova coluna">+</button>
+  `;
+  board.appendChild(addColDiv);
 }
+
+// Função para solicitar nome ao clicar no "+" da coluna em branco
+window.promptAddColumn = function() {
+  const newName = prompt('Digite o nome da nova coluna/etiqueta (pode incluir emojis):');
+  if (newName && newName.trim() !== '') {
+    const newId = 'col_' + Date.now();
+    // Cores aleatórias básicas ou padrão
+    const randomColors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6'];
+    const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)];
+    
+    columns.push({
+      id: newId,
+      name: newName.trim(),
+      color: randomColor
+    });
+
+    localStorage.setItem('dashboard_columns', JSON.stringify(columns));
+    initDashboard();
+  }
+};
+
+// Função para alterar o nome direto ao clicar no título da coluna
+window.quickEditColumnName = function(colId) {
+  const col = columns.find(c => c.id === colId);
+  if (!col) return;
+
+  const newName = prompt('Altere o nome da etiqueta (com emojis se quiser):', col.name);
+  if (newName !== null && newName.trim() !== '') {
+    col.name = newName.trim();
+    localStorage.setItem('dashboard_columns', JSON.stringify(columns));
+    initDashboard();
+  }
+};
 
 function renderStatusSelects() {
   cardStatusSelect.innerHTML = '';
@@ -57,9 +100,9 @@ function renderStatusSelects() {
   });
 }
 
-// Modal de Configurações Dinâmicas
+// Modal de Gerenciamento de Etiquetas (Configurações)
 openSettingsBtn.addEventListener('click', () => {
-  renderColumnsConfigInputs();
+  renderLabelsConfigInputs();
   settingsModal.style.display = 'flex';
 });
 
@@ -67,33 +110,33 @@ closeModalBtn.addEventListener('click', () => {
   settingsModal.style.display = 'none';
 });
 
-function renderColumnsConfigInputs() {
-  columnsConfigList.innerHTML = '';
+function renderLabelsConfigInputs() {
+  labelsConfigList.innerHTML = '';
   columns.forEach((col, index) => {
     const row = document.createElement('div');
     row.classList.add('column-config-row');
     row.innerHTML = `
-      <input type="text" value="${escapeHTML(col.name)}" data-index="${index}" class="col-name-input" placeholder="Ex: 🚀 Nome e Emoji">
+      <input type="text" value="${escapeHTML(col.name)}" data-index="${index}" class="col-name-input" placeholder="Ex: 🚀 Nova Etiqueta">
       <input type="color" value="${col.color}" data-index="${index}" class="col-color-input">
-      <button class="btn-remove-col" onclick="removeColumnConfig(${index})">🗑️</button>
+      <button class="btn-remove-col" onclick="removeLabelConfig(${index})">🗑️</button>
     `;
-    columnsConfigList.appendChild(row);
+    labelsConfigList.appendChild(row);
   });
 }
 
-window.removeColumnConfig = function(index) {
+window.removeLabelConfig = function(index) {
   if (columns.length <= 1) {
-    alert('Você precisa ter pelo menos uma coluna.');
+    alert('Você precisa ter pelo menos uma etiqueta/coluna.');
     return;
   }
   columns.splice(index, 1);
-  renderColumnsConfigInputs();
+  renderLabelsConfigInputs();
 };
 
-addColumnBtn.addEventListener('click', () => {
+addLabelBtn.addEventListener('click', () => {
   const newId = 'col_' + Date.now();
-  columns.push({ id: newId, name: '📋 Nova Coluna', color: '#6366f1' });
-  renderColumnsConfigInputs();
+  columns.push({ id: newId, name: '📋 Nova Etiqueta', color: '#6366f1' });
+  renderLabelsConfigInputs();
 });
 
 saveSettingsBtn.addEventListener('click', () => {
@@ -103,7 +146,7 @@ saveSettingsBtn.addEventListener('click', () => {
   columns = columns.map((col, index) => {
     return {
       id: col.id,
-      name: nameInputs[index].value.trim() || 'Coluna',
+      name: nameInputs[index].value.trim() || 'Etiqueta',
       color: colorInputs[index].value
     };
   });
@@ -223,7 +266,7 @@ form.addEventListener('submit', (e) => {
 
   clientNameInput.value = '';
   clientDescInput.value = '';
-  clientNameInput.focus();
+    clientNameInput.focus();
 });
 
 window.changeTaskStatus = function(index, newStatus) {
