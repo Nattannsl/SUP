@@ -1,256 +1,30 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-}
-
-body {
-  background-color: #0b0f19;
-  color: #f1f5f9;
-  padding: 20px;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.btn-settings {
-  background: #1e293b;
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.card-form {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.card-form form {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.card-form input, .card-form select {
-  background: #0b0f19;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px;
-  border-radius: 8px;
-  outline: none;
-  flex: 1;
-  min-width: 180px;
-}
-
-.card-form button[type="submit"] {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.board {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.column {
-  background: #1e293b;
-  border-radius: 12px;
-  padding: 16px;
-  min-height: 350px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .column h3 {
   font-size: 1rem;
   margin-bottom: 14px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-}
-
-.column-add {
-  background: transparent;
-  border: 2px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  min-height: 350px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.add-column-card-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 2.5rem;
-  cursor: pointer;
-}
-
-.cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.item-card {
-  background: #0b0f19;
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.item-card h4 {
-  font-size: 0.95rem;
-}
-
-.item-card p {
-  font-size: 0.85rem;
-  color: #94a3b8;
-}
-
-.item-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 4px;
 }
 
-.item-actions select {
-  background: #1e293b;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 0.75rem;
-  padding: 4px;
-  border-radius: 6px;
-}
-
-.btn-delete {
-  background: transparent;
-  color: #dc2626;
-  border: none;
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #1e293b;
-  padding: 24px;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.columns-config-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-.column-config-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  background: #0b0f19;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.column-config-row input[type="text"] {
-  flex: 2;
-  background: transparent;
-  border: none;
-  color: #fff;
-  outline: none;
-}
-
-.column-config-row input[type="color"] {
-  width: 30px;
-  height: 30px;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-}
-
-.btn-remove-col {
-  background: transparent;
-  border: none;
-  color: #dc2626;
-  cursor: pointer;
-}
-
-.btn-add-col {
-  background: transparent;
-  color: #38bdf8;
-  border: 1px dashed #38bdf8;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-save {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
+.column-title-text {
   cursor: pointer;
   flex: 1;
-  font-weight: 600;
 }
 
-.btn-cancel {
+.btn-delete-column {
   background: transparent;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 16px;
-  border-radius: 8px;
+  border: none;
+  color: #dc2626;
   cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.btn-delete-column:hover {
+  opacity: 1;
 }
