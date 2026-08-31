@@ -4,7 +4,8 @@ const clientDescInput = document.getElementById('client-desc');
 const cardStatusSelect = document.getElementById('card-status');
 
 const board = document.getElementById('board');
-const toggleBtn = document.getElementById('toggle-layout-btn');
+const toggleLayoutBtn = document.querySelectorAll('.btn-layout')[1];
+const toggleThemeBtn = document.getElementById('toggle-theme-btn');
 
 const containers = {
   pendencia: document.getElementById('container-pendencia'),
@@ -14,6 +15,31 @@ const containers = {
 };
 
 let tasks = JSON.parse(localStorage.getItem('attendance_tasks')) || [];
+
+// Gerenciamento de Tema (Claro / Escuro)
+const savedTheme = localStorage.getItem('dashboard_theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+updateThemeButtonText(savedTheme);
+
+if (toggleThemeBtn) {
+  toggleThemeBtn.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('dashboard_theme', newTheme);
+    updateThemeButtonText(newTheme);
+  });
+}
+
+function updateThemeButtonText(theme) {
+  if (!toggleThemeBtn) return;
+  if (theme === 'light') {
+    toggleThemeBtn.innerHTML = '<span>🌙</span> Tema Escuro';
+  } else {
+    toggleThemeBtn.innerHTML = '<span>☀️</span> Tema Claro';
+  }
+}
 
 function renderTasks() {
   Object.values(containers).forEach(container => {
@@ -127,18 +153,18 @@ function escapeHTML(str) {
 
 let isKanban = false;
 
-if (toggleBtn) {
-  toggleBtn.addEventListener('click', () => {
+if (toggleLayoutBtn) {
+  toggleLayoutBtn.addEventListener('click', () => {
     isKanban = !isKanban;
 
     if (isKanban) {
       board.classList.remove('grid-mode');
       board.classList.add('kanban-mode');
-      toggleBtn.innerHTML = '<span>📱</span> Modo Grade (Retrato)';
+      toggleLayoutBtn.innerHTML = '<span>📱</span> Modo Grade (Retrato)';
     } else {
       board.classList.remove('kanban-mode');
       board.classList.add('grid-mode');
-      toggleBtn.innerHTML = '<span>↔️</span> Modo Paisagem (Kanban)';
+      toggleLayoutBtn.innerHTML = '<span>↔️</span> Modo Paisagem (Kanban)';
     }
   });
 }
