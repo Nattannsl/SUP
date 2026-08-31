@@ -1,63 +1,46 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>General Dashboard</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>📋 General Dashboard</h1>
-      <div class="header-actions">
-        <button id="open-settings-btn" class="btn-layout">
-          <span>⚙️</span> Gerenciar Etiquetas
-        </button>
-        <button id="toggle-theme-btn" class="btn-layout">
-          <span>☀️</span> Tema Claro
-        </button>
-        <button id="toggle-layout-btn" class="btn-layout">
-          <span>↔️</span> Modo Paisagem (Kanban)
-        </button>
-      </div>
+      <h1>Gerenciador</h1>
+      <button id="open-settings-btn" class="btn-settings">⚙️ Gerenciar Etiquetas</button>
     </header>
 
     <!-- Modal de Gerenciamento de Etiquetas -->
     <div id="settings-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
         <h3>Gerenciar Etiquetas</h3>
-        <p class="modal-subtitle">Adicione novas etiquetas, altere cores e emojis livremente.</p>
+        <p class="modal-subtitle">Adicione novas etiquetas, altere cores e emojis.</p>
         
-        <div id="labels-config-list" class="columns-config-list">
-          <!-- Preenchido dinamicamente pelo JS -->
-        </div>
+        <div id="labels-config-list" class="columns-config-list"></div>
 
         <button id="add-label-btn" class="btn-add-col">+ Adicionar Nova Etiqueta</button>
 
         <div class="modal-actions">
-          <button id="save-settings-btn" class="btn-save">Salvar Alterações</button>
+          <button id="save-settings-btn" class="btn-save">Salvar</button>
           <button id="close-modal-btn" class="btn-cancel">Fechar</button>
         </div>
       </div>
     </div>
 
     <section class="card-form">
-      <h2>Novo Item / Tarefa</h2>
       <form id="attendance-form">
-        <input type="text" id="client-name" placeholder="Título ou Nome" required autocomplete="off">
-        <input type="text" id="client-desc" placeholder="Descrição ou Detalhes" autocomplete="off">
-        <select id="card-status">
-          <!-- Opções preenchidas dinamicamente -->
-        </select>
+        <input type="text" id="client-name" placeholder="Título" required autocomplete="off">
+        <input type="text" id="client-desc" placeholder="Descrição" autocomplete="off">
+        <select id="card-status"></select>
         <button type="submit">+ Adicionar</button>
       </form>
     </section>
 
-    <main id="board" class="board grid-mode">
-      <!-- Colunas e botão de adicionar gerados dinamicamente -->
-    </main>
+    <main id="board" class="board"></main>
   </div>
 
   <script src="script.js"></script>
