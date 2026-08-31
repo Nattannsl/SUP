@@ -181,7 +181,7 @@ header h1 {
   gap: 24px;
 }
 
-.board.kanban-mode .column {
+.board.kanban-mode .column, .board.kanban-mode .column-add {
   min-width: 320px;
   max-width: 360px;
   flex: 0 0 auto;
@@ -208,6 +208,50 @@ header h1 {
   margin-bottom: 18px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--column-border);
+  cursor: pointer;
+  display: inline-block;
+}
+
+.column h3:hover {
+  opacity: 0.8;
+}
+
+/* Coluna de Adicionar Nova */
+.column-add {
+  background: transparent;
+  border: 2px dashed var(--column-border);
+  border-radius: 24px;
+  min-height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.column-add:hover {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.add-column-card-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 2.5rem;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.column-add:hover .add-column-card-btn {
+  transform: scale(1.1);
+  color: #2563eb;
 }
 
 .cards-container {
@@ -279,7 +323,7 @@ header h1 {
   color: #ffffff;
 }
 
-/* Modal e Gerenciamento */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
