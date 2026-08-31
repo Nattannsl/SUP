@@ -13,7 +13,7 @@
       <h1>📋 General Dashboard</h1>
       <div class="header-actions">
         <button id="open-settings-btn" class="btn-layout">
-          <span>⚙️</span> Gerenciar Colunas
+          <span>⚙️</span> Gerenciar Etiquetas
         </button>
         <button id="toggle-theme-btn" class="btn-layout">
           <span>☀️</span> Tema Claro
@@ -24,17 +24,17 @@
       </div>
     </header>
 
-    <!-- Modal de Gerenciamento de Colunas -->
+    <!-- Modal de Gerenciamento de Etiquetas -->
     <div id="settings-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
-        <h3>Gerenciar Colunas e Etiquetas</h3>
-        <p class="modal-subtitle">Adicione novas colunas, altere nomes, emojis e cores livremente.</p>
+        <h3>Gerenciar Etiquetas</h3>
+        <p class="modal-subtitle">Adicione novas etiquetas, altere cores e emojis livremente.</p>
         
-        <div id="columns-config-list" class="columns-config-list">
+        <div id="labels-config-list" class="columns-config-list">
           <!-- Preenchido dinamicamente pelo JS -->
         </div>
 
-        <button id="add-column-btn" class="btn-add-col">+ Adicionar Nova Coluna</button>
+        <button id="add-label-btn" class="btn-add-col">+ Adicionar Nova Etiqueta</button>
 
         <div class="modal-actions">
           <button id="save-settings-btn" class="btn-save">Salvar Alterações</button>
@@ -56,7 +56,7 @@
     </section>
 
     <main id="board" class="board grid-mode">
-      <!-- Colunas geradas dinamicamente -->
+      <!-- Colunas e botão de adicionar gerados dinamicamente -->
     </main>
   </div>
 
