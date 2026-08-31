@@ -12,6 +12,9 @@
     <header>
       <h1>📋 General Dashboard</h1>
       <div class="header-actions">
+        <button id="open-settings-btn" class="btn-layout">
+          <span>⚙️</span> Editar Etiquetas
+        </button>
         <button id="toggle-theme-btn" class="btn-layout">
           <span>☀️</span> Tema Claro
         </button>
@@ -21,16 +24,43 @@
       </div>
     </header>
 
+    <!-- Modal de Configuração de Etiquetas -->
+    <div id="settings-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <h3>Personalizar Nomes das Colunas / Etiquetas</h3>
+        <div class="form-group">
+          <label>📌 Coluna 1 (Pendência):</label>
+          <input type="text" id="label-pendencia" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>⏳ Coluna 2 (Espera):</label>
+          <input type="text" id="label-espera" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>🔄 Coluna 3 (Em Andamento):</label>
+          <input type="text" id="label-atendimento" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>✅ Coluna 4 (Concluído):</label>
+          <input type="text" id="label-concluido" autocomplete="off">
+        </div>
+        <div class="modal-actions">
+          <button id="save-labels-btn" class="btn-save">Salvar Alterações</button>
+          <button id="close-modal-btn" class="btn-cancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <section class="card-form">
       <h2>Novo Item / Tarefa</h2>
       <form id="attendance-form">
         <input type="text" id="client-name" placeholder="Título ou Nome" required autocomplete="off">
         <input type="text" id="client-desc" placeholder="Descrição ou Detalhes" autocomplete="off">
         <select id="card-status">
-          <option value="pendencia">📌 Pendência</option>
-          <option value="espera">⏳ Espera</option>
-          <option value="atendimento">🔄 Em Andamento</option>
-          <option value="concluido">✅ Concluído</option>
+          <option value="pendencia" id="opt-pendencia">📌 Pendência</option>
+          <option value="espera" id="opt-espera">⏳ Espera</option>
+          <option value="atendimento" id="opt-atendimento">🔄 Em Andamento</option>
+          <option value="concluido" id="opt-concluido">✅ Concluído</option>
         </select>
         <button type="submit">+ Adicionar</button>
       </form>
@@ -42,7 +72,7 @@
            ondragover="allowDrop(event)" 
            ondragleave="removeDropStyle(event)" 
            ondrop="dropTask(event, 'pendencia')">
-        <h3>📌 Pendências</h3>
+        <h3 id="title-pendencia">📌 Pendências</h3>
         <div class="cards-container" id="container-pendencia"></div>
       </div>
 
@@ -51,7 +81,7 @@
            ondragover="allowDrop(event)" 
            ondragleave="removeDropStyle(event)" 
            ondrop="dropTask(event, 'espera')">
-        <h3>⏳ Em Espera</h3>
+        <h3 id="title-espera">⏳ Em Espera</h3>
         <div class="cards-container" id="container-espera"></div>
       </div>
 
@@ -60,7 +90,7 @@
            ondragover="allowDrop(event)" 
            ondragleave="removeDropStyle(event)" 
            ondrop="dropTask(event, 'atendimento')">
-        <h3>🔄 Em Andamento</h3>
+        <h3 id="title-atendimento">🔄 Em Andamento</h3>
         <div class="cards-container" id="container-atendimento"></div>
       </div>
 
@@ -69,7 +99,7 @@
            ondragover="allowDrop(event)" 
            ondragleave="removeDropStyle(event)" 
            ondrop="dropTask(event, 'concluido')">
-        <h3>✅ Concluído</h3>
+        <h3 id="title-concluido">✅ Concluído</h3>
         <div class="cards-container" id="container-concluido"></div>
       </div>
     </main>
