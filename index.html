@@ -13,7 +13,7 @@
       <h1>📋 General Dashboard</h1>
       <div class="header-actions">
         <button id="open-settings-btn" class="btn-layout">
-          <span>⚙️</span> Editar Etiquetas
+          <span>⚙️</span> Gerenciar Colunas
         </button>
         <button id="toggle-theme-btn" class="btn-layout">
           <span>☀️</span> Tema Claro
@@ -24,29 +24,21 @@
       </div>
     </header>
 
-    <!-- Modal de Configuração de Etiquetas -->
+    <!-- Modal de Gerenciamento de Colunas -->
     <div id="settings-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
-        <h3>Personalizar Nomes das Colunas / Etiquetas</h3>
-        <div class="form-group">
-          <label>📌 Coluna 1 (Pendência):</label>
-          <input type="text" id="label-pendencia" autocomplete="off">
+        <h3>Gerenciar Colunas e Etiquetas</h3>
+        <p class="modal-subtitle">Adicione novas colunas, altere nomes, emojis e cores livremente.</p>
+        
+        <div id="columns-config-list" class="columns-config-list">
+          <!-- Preenchido dinamicamente pelo JS -->
         </div>
-        <div class="form-group">
-          <label>⏳ Coluna 2 (Espera):</label>
-          <input type="text" id="label-espera" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label>🔄 Coluna 3 (Em Andamento):</label>
-          <input type="text" id="label-atendimento" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label>✅ Coluna 4 (Concluído):</label>
-          <input type="text" id="label-concluido" autocomplete="off">
-        </div>
+
+        <button id="add-column-btn" class="btn-add-col">+ Adicionar Nova Coluna</button>
+
         <div class="modal-actions">
-          <button id="save-labels-btn" class="btn-save">Salvar Alterações</button>
-          <button id="close-modal-btn" class="btn-cancel">Cancelar</button>
+          <button id="save-settings-btn" class="btn-save">Salvar Alterações</button>
+          <button id="close-modal-btn" class="btn-cancel">Fechar</button>
         </div>
       </div>
     </div>
@@ -57,51 +49,14 @@
         <input type="text" id="client-name" placeholder="Título ou Nome" required autocomplete="off">
         <input type="text" id="client-desc" placeholder="Descrição ou Detalhes" autocomplete="off">
         <select id="card-status">
-          <option value="pendencia" id="opt-pendencia">📌 Pendência</option>
-          <option value="espera" id="opt-espera">⏳ Espera</option>
-          <option value="atendimento" id="opt-atendimento">🔄 Em Andamento</option>
-          <option value="concluido" id="opt-concluido">✅ Concluído</option>
+          <!-- Opções preenchidas dinamicamente -->
         </select>
         <button type="submit">+ Adicionar</button>
       </form>
     </section>
 
     <main id="board" class="board grid-mode">
-      <!-- Coluna Pendência -->
-      <div class="column" id="col-pendencia" 
-           ondragover="allowDrop(event)" 
-           ondragleave="removeDropStyle(event)" 
-           ondrop="dropTask(event, 'pendencia')">
-        <h3 id="title-pendencia">📌 Pendências</h3>
-        <div class="cards-container" id="container-pendencia"></div>
-      </div>
-
-      <!-- Coluna Espera -->
-      <div class="column" id="col-espera" 
-           ondragover="allowDrop(event)" 
-           ondragleave="removeDropStyle(event)" 
-           ondrop="dropTask(event, 'espera')">
-        <h3 id="title-espera">⏳ Em Espera</h3>
-        <div class="cards-container" id="container-espera"></div>
-      </div>
-
-      <!-- Coluna Em Andamento -->
-      <div class="column" id="col-atendimento" 
-           ondragover="allowDrop(event)" 
-           ondragleave="removeDropStyle(event)" 
-           ondrop="dropTask(event, 'atendimento')">
-        <h3 id="title-atendimento">🔄 Em Andamento</h3>
-        <div class="cards-container" id="container-atendimento"></div>
-      </div>
-
-      <!-- Coluna Concluído -->
-      <div class="column" id="col-concluido" 
-           ondragover="allowDrop(event)" 
-           ondragleave="removeDropStyle(event)" 
-           ondrop="dropTask(event, 'concluido')">
-        <h3 id="title-concluido">✅ Concluído</h3>
-        <div class="cards-container" id="container-concluido"></div>
-      </div>
+      <!-- Colunas geradas dinamicamente -->
     </main>
   </div>
 
