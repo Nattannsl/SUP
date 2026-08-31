@@ -4,8 +4,6 @@ const clientDescInput = document.getElementById('client-desc');
 const cardStatusSelect = document.getElementById('card-status');
 const board = document.getElementById('board');
 
-const toggleLayoutBtn = document.querySelectorAll('.btn-layout')[2];
-const toggleThemeBtn = document.getElementById('toggle-theme-btn');
 const openSettingsBtn = document.getElementById('open-settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
@@ -15,7 +13,6 @@ const labelsConfigList = document.getElementById('labels-config-list');
 
 let tasks = JSON.parse(localStorage.getItem('attendance_tasks')) || [];
 
-// Lista de colunas/etiquetas
 let columns = JSON.parse(localStorage.getItem('dashboard_columns')) || [
   { id: 'pendencia', name: '📌 Pendências', color: '#dc2626' },
   { id: 'espera', name: '⏳ Em Espera', color: '#d97706' },
@@ -32,23 +29,21 @@ function initDashboard() {
 function renderBoardStructure() {
   board.innerHTML = '';
   
-  // Renderiza as colunas normais
   columns.forEach(col => {
     const colDiv = document.createElement('div');
     colDiv.classList.add('column');
     colDiv.id = `col-${col.id}`;
     colDiv.setAttribute('ondragover', 'allowDrop(event)');
-    colDiv.setAttribute('ondragleave', 'removeDropStyle(event)');
+    colDiv.setAttribute('ondragdrop', 'removeDropStyle(event)');
     colDiv.setAttribute('ondrop', `dropTask(event, '${col.id}')`);
 
     colDiv.innerHTML = `
-      <h3 style="color: ${col.color}; border-color: ${col.color}33;" title="Clique para editar o nome" onclick="quickEditColumnName('${col.id}')">${escapeHTML(col.name)}</h3>
+      <h3 style="color: ${col.color};" title="Clique para alterar o nome" onclick="quickEditColumnName('${col.id}')">${escapeHTML(col.name)}</h3>
       <div class="cards-container" id="container-${col.id}"></div>
     `;
     board.appendChild(colDiv);
   });
 
-  // Renderiza a coluna em branco com o botão "+" para adicionar nova coluna/etiqueta
   const addColDiv = document.createElement('div');
   addColDiv.classList.add('column-add');
   addColDiv.innerHTML = `
@@ -57,32 +52,24 @@ function renderBoardStructure() {
   board.appendChild(addColDiv);
 }
 
-// Função para solicitar nome ao clicar no "+" da coluna em branco
 window.promptAddColumn = function() {
-  const newName = prompt('Digite o nome da nova coluna/etiqueta (pode incluir emojis):');
+  const newName = prompt('Digite o nome da nova coluna (pode usar emojis):');
   if (newName && newName.trim() !== '') {
     const newId = 'col_' + Date.now();
-    // Cores aleatórias básicas ou padrão
-    const randomColors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6'];
-    const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)];
+    const colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
     
-    columns.push({
-      id: newId,
-      name: newName.trim(),
-      color: randomColor
-    });
-
+    columns.push({ id: newId, name: newName.trim(), color: randomColor });
     localStorage.setItem('dashboard_columns', JSON.stringify(columns));
     initDashboard();
   }
 };
 
-// Função para alterar o nome direto ao clicar no título da coluna
 window.quickEditColumnName = function(colId) {
   const col = columns.find(c => c.id === colId);
   if (!col) return;
 
-  const newName = prompt('Altere o nome da etiqueta (com emojis se quiser):', col.name);
+  const newName = prompt('Altere o nome da coluna:', col.name);
   if (newName !== null && newName.trim() !== '') {
     col.name = newName.trim();
     localStorage.setItem('dashboard_columns', JSON.stringify(columns));
@@ -100,7 +87,6 @@ function renderStatusSelects() {
   });
 }
 
-// Modal de Gerenciamento de Etiquetas (Configurações)
 openSettingsBtn.addEventListener('click', () => {
   renderLabelsConfigInputs();
   settingsModal.style.display = 'flex';
@@ -116,7 +102,7 @@ function renderLabelsConfigInputs() {
     const row = document.createElement('div');
     row.classList.add('column-config-row');
     row.innerHTML = `
-      <input type="text" value="${escapeHTML(col.name)}" data-index="${index}" class="col-name-input" placeholder="Ex: 🚀 Nova Etiqueta">
+      <input type="text" value="${escapeHTML(col.name)}" data-index="${index}" class="col-name-input">
       <input type="color" value="${col.color}" data-index="${index}" class="col-color-input">
       <button class="btn-remove-col" onclick="removeLabelConfig(${index})">🗑️</button>
     `;
@@ -126,7 +112,7 @@ function renderLabelsConfigInputs() {
 
 window.removeLabelConfig = function(index) {
   if (columns.length <= 1) {
-    alert('Você precisa ter pelo menos uma etiqueta/coluna.');
+    alert('Mantenha pelo menos uma coluna.');
     return;
   }
   columns.splice(index, 1);
@@ -135,7 +121,7 @@ window.removeLabelConfig = function(index) {
 
 addLabelBtn.addEventListener('click', () => {
   const newId = 'col_' + Date.now();
-  columns.push({ id: newId, name: '📋 Nova Etiqueta', color: '#6366f1' });
+  columns.push({ id: newId, name: '📌 Nova Coluna', color: '#6366f1' });
   renderLabelsConfigInputs();
 });
 
@@ -146,7 +132,7 @@ saveSettingsBtn.addEventListener('click', () => {
   columns = columns.map((col, index) => {
     return {
       id: col.id,
-      name: nameInputs[index].value.trim() || 'Etiqueta',
+      name: nameInputs[index].value.trim() || 'Coluna',
       color: colorInputs[index].value
     };
   });
@@ -155,30 +141,6 @@ saveSettingsBtn.addEventListener('click', () => {
   initDashboard();
   settingsModal.style.display = 'none';
 });
-
-// Gerenciamento de Tema
-const savedTheme = localStorage.getItem('dashboard_theme') || 'dark';
-document.documentElement.setAttribute('data-theme', savedTheme);
-updateThemeButtonText(savedTheme);
-
-if (toggleThemeBtn) {
-  toggleThemeBtn.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('dashboard_theme', newTheme);
-    updateThemeButtonText(newTheme);
-  });
-}
-
-function updateThemeButtonText(theme) {
-  if (!toggleThemeBtn) return;
-  if (theme === 'light') {
-    toggleThemeBtn.innerHTML = '<span>🌙</span> Tema Escuro';
-  } else {
-    toggleThemeBtn.innerHTML = '<span>☀️</span> Tema Claro';
-  }
-}
 
 function renderTasks() {
   columns.forEach(col => {
@@ -195,17 +157,10 @@ function renderTasks() {
     const card = document.createElement('div');
     card.classList.add('item-card');
     card.setAttribute('draggable', 'true');
-    card.dataset.index = index;
     card.style.borderLeft = `4px solid ${colInfo.color}`;
 
     card.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', index);
-      setTimeout(() => card.classList.add('dragging'), 0);
-    });
-
-    card.addEventListener('dragend', () => {
-      card.classList.remove('dragging');
-      document.querySelectorAll('.column').forEach(col => col.classList.remove('drag-over'));
     });
 
     let optionsHTML = columns.map(c => `
@@ -214,7 +169,7 @@ function renderTasks() {
 
     card.innerHTML = `
       <h4>${escapeHTML(task.name)}</h4>
-      <p>${escapeHTML(task.desc || 'Sem descrição')}</p>
+      <p>${escapeHTML(task.desc || '')}</p>
       <div class="item-actions">
         <select onchange="changeTaskStatus(${index}, this.value)">
           ${optionsHTML}
@@ -229,20 +184,10 @@ function renderTasks() {
 
 window.allowDrop = function(e) {
   e.preventDefault();
-  const column = e.target.closest('.column');
-  if (column) column.classList.add('drag-over');
-};
-
-window.removeDropStyle = function(e) {
-  const column = e.target.closest('.column');
-  if (column) column.classList.remove('drag-over');
 };
 
 window.dropTask = function(e, newStatus) {
   e.preventDefault();
-  const column = e.target.closest('.column');
-  if (column) column.classList.remove('drag-over');
-
   const taskIndex = e.dataTransfer.getData('text/plain');
   if (taskIndex !== '' && tasks[taskIndex]) {
     tasks[taskIndex].status = newStatus;
@@ -266,7 +211,7 @@ form.addEventListener('submit', (e) => {
 
   clientNameInput.value = '';
   clientDescInput.value = '';
-    clientNameInput.focus();
+  clientNameInput.focus();
 });
 
 window.changeTaskStatus = function(index, newStatus) {
@@ -275,13 +220,8 @@ window.changeTaskStatus = function(index, newStatus) {
 };
 
 window.deleteTask = function(index) {
-  const taskName = tasks[index] ? tasks[index].name : 'este item';
-  const confirmed = confirm(`Tem certeza que deseja excluir "${taskName}"?`);
-  
-  if (confirmed) {
-    tasks.splice(index, 1);
-    saveAndRender();
-  }
+  tasks.splice(index, 1);
+  saveAndRender();
 };
 
 function saveAndRender() {
@@ -293,24 +233,6 @@ function escapeHTML(str) {
   return str.replace(/[&<>'"]/g, 
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
-}
-
-let isKanban = false;
-
-if (toggleLayoutBtn) {
-  toggleLayoutBtn.addEventListener('click', () => {
-    isKanban = !isKanban;
-
-    if (isKanban) {
-      board.classList.remove('grid-mode');
-      board.classList.add('kanban-mode');
-      toggleLayoutBtn.innerHTML = '<span>📱</span> Modo Grade (Retrato)';
-    } else {
-      board.classList.remove('kanban-mode');
-      board.classList.add('grid-mode');
-      toggleLayoutBtn.innerHTML = '<span>↔️</span> Modo Paisagem (Kanban)';
-    }
-  });
 }
 
 initDashboard();
