@@ -2,68 +2,64 @@ const form = document.getElementById('attendance-form');
 const clientNameInput = document.getElementById('client-name');
 const clientDescInput = document.getElementById('client-desc');
 const cardStatusSelect = document.getElementById('card-status');
-
 const board = document.getElementById('board');
+
 const toggleLayoutBtn = document.querySelectorAll('.btn-layout')[2];
 const toggleThemeBtn = document.getElementById('toggle-theme-btn');
 const openSettingsBtn = document.getElementById('open-settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
-const saveLabelsBtn = document.getElementById('save-labels-btn');
-
-const inputLabelPendencia = document.getElementById('label-pendencia');
-const inputLabelEspera = document.getElementById('label-espera');
-const inputLabelAtendimento = document.getElementById('label-atendimento');
-const inputLabelConcluido = document.getElementById('label-concluido');
-
-const titlePendencia = document.getElementById('title-pendencia');
-const titleEspera = document.getElementById('title-espera');
-const titleAtendimento = document.getElementById('title-atendimento');
-const titleConcluido = document.getElementById('title-concluido');
-
-const optPendencia = document.getElementById('opt-pendencia');
-const optEspera = document.getElementById('opt-espera');
-const optAtendimento = document.getElementById('opt-atendimento');
-const optConcluido = document.getElementById('opt-concluido');
-
-const containers = {
-  pendencia: document.getElementById('container-pendencia'),
-  espera: document.getElementById('container-espera'),
-  atendimento: document.getElementById('container-atendimento'),
-  concluido: document.getElementById('container-concluido')
-};
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+const addColumnBtn = document.getElementById('add-column-btn');
+const columnsConfigList = document.getElementById('columns-config-list');
 
 let tasks = JSON.parse(localStorage.getItem('attendance_tasks')) || [];
 
-// Padrões de Etiquetas
-let labels = JSON.parse(localStorage.getItem('dashboard_labels')) || {
-  pendencia: '📌 Pendências',
-  espera: '⏳ Em Espera',
-  atendimento: '🔄 Em Andamento',
-  concluido: '✅ Concluído'
-};
+// Estrutura padrão das colunas (permite adicionar, alterar nomes, emojis e cores)
+let columns = JSON.parse(localStorage.getItem('dashboard_columns')) || [
+  { id: 'pendencia', name: '📌 Pendências', color: '#dc2626' },
+  { id: 'espera', name: '⏳ Em Espera', color: '#d97706' },
+  { id: 'atendimento', name: '🔄 Em Andamento', color: '#0284c7' },
+  { id: 'concluido', name: '✅ Concluído', color: '#059669' }
+];
 
-function applyLabels() {
-  titlePendencia.textContent = labels.pendencia;
-  titleEspera.textContent = labels.espera;
-  titleAtendimento.textContent = labels.atendimento;
-  titleConcluido.textContent = labels.concluido;
-
-  optPendencia.textContent = labels.pendencia;
-  optEspera.textContent = labels.espera;
-  optAtendimento.textContent = labels.atendimento;
-  optConcluido.textContent = labels.concluido;
-
-  inputLabelPendencia.value = labels.pendencia;
-  inputLabelEspera.value = labels.espera;
-  inputLabelAtendimento.value = labels.atendimento;
-  inputLabelConcluido.value = labels.concluido;
+function initDashboard() {
+  renderBoardStructure();
+  renderStatusSelects();
+  renderTasks();
 }
 
-applyLabels();
+function renderBoardStructure() {
+  board.innerHTML = '';
+  columns.forEach(col => {
+    const colDiv = document.createElement('div');
+    colDiv.classList.add('column');
+    colDiv.id = `col-${col.id}`;
+    colDiv.setAttribute('ondragover', 'allowDrop(event)');
+    colDiv.setAttribute('ondragleave', 'removeDropStyle(event)');
+    colDiv.setAttribute('ondrop', `dropTask(event, '${col.id}')`);
 
-// Modal de Configuração
+    colDiv.innerHTML = `
+      <h3 style="color: ${col.color}; border-color: ${col.color}33;">${escapeHTML(col.name)}</h3>
+      <div class="cards-container" id="container-${col.id}"></div>
+    `;
+    board.appendChild(colDiv);
+  });
+}
+
+function renderStatusSelects() {
+  cardStatusSelect.innerHTML = '';
+  columns.forEach(col => {
+    const option = document.createElement('option');
+    option.value = col.id;
+    option.textContent = col.name;
+    cardStatusSelect.appendChild(option);
+  });
+}
+
+// Modal de Configurações Dinâmicas
 openSettingsBtn.addEventListener('click', () => {
+  renderColumnsConfigInputs();
   settingsModal.style.display = 'flex';
 });
 
@@ -71,15 +67,49 @@ closeModalBtn.addEventListener('click', () => {
   settingsModal.style.display = 'none';
 });
 
-saveLabelsBtn.addEventListener('click', () => {
-  labels.pendencia = inputLabelPendencia.value.trim() || '📌 Pendências';
-  labels.espera = inputLabelEspera.value.trim() || '⏳ Em Espera';
-  labels.atendimento = inputLabelAtendimento.value.trim() || '🔄 Em Andamento';
-  labels.concluido = inputLabelConcluido.value.trim() || '✅ Concluído';
+function renderColumnsConfigInputs() {
+  columnsConfigList.innerHTML = '';
+  columns.forEach((col, index) => {
+    const row = document.createElement('div');
+    row.classList.add('column-config-row');
+    row.innerHTML = `
+      <input type="text" value="${escapeHTML(col.name)}" data-index="${index}" class="col-name-input" placeholder="Ex: 🚀 Nome e Emoji">
+      <input type="color" value="${col.color}" data-index="${index}" class="col-color-input">
+      <button class="btn-remove-col" onclick="removeColumnConfig(${index})">🗑️</button>
+    `;
+    columnsConfigList.appendChild(row);
+  });
+}
 
-  localStorage.setItem('dashboard_labels', JSON.stringify(labels));
-  applyLabels();
-  renderTasks();
+window.removeColumnConfig = function(index) {
+  if (columns.length <= 1) {
+    alert('Você precisa ter pelo menos uma coluna.');
+    return;
+  }
+  columns.splice(index, 1);
+  renderColumnsConfigInputs();
+};
+
+addColumnBtn.addEventListener('click', () => {
+  const newId = 'col_' + Date.now();
+  columns.push({ id: newId, name: '📋 Nova Coluna', color: '#6366f1' });
+  renderColumnsConfigInputs();
+});
+
+saveSettingsBtn.addEventListener('click', () => {
+  const nameInputs = document.querySelectorAll('.col-name-input');
+  const colorInputs = document.querySelectorAll('.col-color-input');
+
+  columns = columns.map((col, index) => {
+    return {
+      id: col.id,
+      name: nameInputs[index].value.trim() || 'Coluna',
+      color: colorInputs[index].value
+    };
+  });
+
+  localStorage.setItem('dashboard_columns', JSON.stringify(columns));
+  initDashboard();
   settingsModal.style.display = 'none';
 });
 
@@ -108,18 +138,22 @@ function updateThemeButtonText(theme) {
 }
 
 function renderTasks() {
-  Object.values(containers).forEach(container => {
+  columns.forEach(col => {
+    const container = document.getElementById(`container-${col.id}`);
     if (container) container.innerHTML = '';
   });
 
   tasks.forEach((task, index) => {
-    const targetContainer = containers[task.status];
+    const targetContainer = document.getElementById(`container-${task.status}`);
     if (!targetContainer) return;
+
+    const colInfo = columns.find(c => c.id === task.status) || { color: '#2563eb' };
 
     const card = document.createElement('div');
     card.classList.add('item-card');
     card.setAttribute('draggable', 'true');
     card.dataset.index = index;
+    card.style.borderLeft = `4px solid ${colInfo.color}`;
 
     card.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', index);
@@ -131,15 +165,16 @@ function renderTasks() {
       document.querySelectorAll('.column').forEach(col => col.classList.remove('drag-over'));
     });
 
+    let optionsHTML = columns.map(c => `
+      <option value="${c.id}" ${task.status === c.id ? 'selected' : ''}>${escapeHTML(c.name)}</option>
+    `).join('');
+
     card.innerHTML = `
       <h4>${escapeHTML(task.name)}</h4>
       <p>${escapeHTML(task.desc || 'Sem descrição')}</p>
       <div class="item-actions">
         <select onchange="changeTaskStatus(${index}, this.value)">
-          <option value="pendencia" ${task.status === 'pendencia' ? 'selected' : ''}>${labels.pendencia}</option>
-          <option value="espera" ${task.status === 'espera' ? 'selected' : ''}>${labels.espera}</option>
-          <option value="atendimento" ${task.status === 'atendimento' ? 'selected' : ''}>${labels.atendimento}</option>
-          <option value="concluido" ${task.status === 'concluido' ? 'selected' : ''}>${labels.concluido}</option>
+          ${optionsHTML}
         </select>
         <button class="btn-delete" onclick="deleteTask(${index})">Excluir</button>
       </div>
@@ -235,4 +270,4 @@ if (toggleLayoutBtn) {
   });
 }
 
-renderTasks();
+initDashboard();
