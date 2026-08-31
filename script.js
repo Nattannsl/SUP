@@ -4,8 +4,27 @@ const clientDescInput = document.getElementById('client-desc');
 const cardStatusSelect = document.getElementById('card-status');
 
 const board = document.getElementById('board');
-const toggleLayoutBtn = document.querySelectorAll('.btn-layout')[1];
+const toggleLayoutBtn = document.querySelectorAll('.btn-layout')[2];
 const toggleThemeBtn = document.getElementById('toggle-theme-btn');
+const openSettingsBtn = document.getElementById('open-settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const saveLabelsBtn = document.getElementById('save-labels-btn');
+
+const inputLabelPendencia = document.getElementById('label-pendencia');
+const inputLabelEspera = document.getElementById('label-espera');
+const inputLabelAtendimento = document.getElementById('label-atendimento');
+const inputLabelConcluido = document.getElementById('label-concluido');
+
+const titlePendencia = document.getElementById('title-pendencia');
+const titleEspera = document.getElementById('title-espera');
+const titleAtendimento = document.getElementById('title-atendimento');
+const titleConcluido = document.getElementById('title-concluido');
+
+const optPendencia = document.getElementById('opt-pendencia');
+const optEspera = document.getElementById('opt-espera');
+const optAtendimento = document.getElementById('opt-atendimento');
+const optConcluido = document.getElementById('opt-concluido');
 
 const containers = {
   pendencia: document.getElementById('container-pendencia'),
@@ -16,7 +35,55 @@ const containers = {
 
 let tasks = JSON.parse(localStorage.getItem('attendance_tasks')) || [];
 
-// Gerenciamento de Tema (Claro / Escuro)
+// Padrões de Etiquetas
+let labels = JSON.parse(localStorage.getItem('dashboard_labels')) || {
+  pendencia: '📌 Pendências',
+  espera: '⏳ Em Espera',
+  atendimento: '🔄 Em Andamento',
+  concluido: '✅ Concluído'
+};
+
+function applyLabels() {
+  titlePendencia.textContent = labels.pendencia;
+  titleEspera.textContent = labels.espera;
+  titleAtendimento.textContent = labels.atendimento;
+  titleConcluido.textContent = labels.concluido;
+
+  optPendencia.textContent = labels.pendencia;
+  optEspera.textContent = labels.espera;
+  optAtendimento.textContent = labels.atendimento;
+  optConcluido.textContent = labels.concluido;
+
+  inputLabelPendencia.value = labels.pendencia;
+  inputLabelEspera.value = labels.espera;
+  inputLabelAtendimento.value = labels.atendimento;
+  inputLabelConcluido.value = labels.concluido;
+}
+
+applyLabels();
+
+// Modal de Configuração
+openSettingsBtn.addEventListener('click', () => {
+  settingsModal.style.display = 'flex';
+});
+
+closeModalBtn.addEventListener('click', () => {
+  settingsModal.style.display = 'none';
+});
+
+saveLabelsBtn.addEventListener('click', () => {
+  labels.pendencia = inputLabelPendencia.value.trim() || '📌 Pendências';
+  labels.espera = inputLabelEspera.value.trim() || '⏳ Em Espera';
+  labels.atendimento = inputLabelAtendimento.value.trim() || '🔄 Em Andamento';
+  labels.concluido = inputLabelConcluido.value.trim() || '✅ Concluído';
+
+  localStorage.setItem('dashboard_labels', JSON.stringify(labels));
+  applyLabels();
+  renderTasks();
+  settingsModal.style.display = 'none';
+});
+
+// Gerenciamento de Tema
 const savedTheme = localStorage.getItem('dashboard_theme') || 'dark';
 document.documentElement.setAttribute('data-theme', savedTheme);
 updateThemeButtonText(savedTheme);
@@ -25,7 +92,6 @@ if (toggleThemeBtn) {
   toggleThemeBtn.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('dashboard_theme', newTheme);
     updateThemeButtonText(newTheme);
@@ -70,10 +136,10 @@ function renderTasks() {
       <p>${escapeHTML(task.desc || 'Sem descrição')}</p>
       <div class="item-actions">
         <select onchange="changeTaskStatus(${index}, this.value)">
-          <option value="pendencia" ${task.status === 'pendencia' ? 'selected' : ''}>📌 Pendência</option>
-          <option value="espera" ${task.status === 'espera' ? 'selected' : ''}>⏳ Espera</option>
-          <option value="atendimento" ${task.status === 'atendimento' ? 'selected' : ''}>🔄 Em Andamento</option>
-          <option value="concluido" ${task.status === 'concluido' ? 'selected' : ''}>✅ Concluído</option>
+          <option value="pendencia" ${task.status === 'pendencia' ? 'selected' : ''}>${labels.pendencia}</option>
+          <option value="espera" ${task.status === 'espera' ? 'selected' : ''}>${labels.espera}</option>
+          <option value="atendimento" ${task.status === 'atendimento' ? 'selected' : ''}>${labels.atendimento}</option>
+          <option value="concluido" ${task.status === 'concluido' ? 'selected' : ''}>${labels.concluido}</option>
         </select>
         <button class="btn-delete" onclick="deleteTask(${index})">Excluir</button>
       </div>
